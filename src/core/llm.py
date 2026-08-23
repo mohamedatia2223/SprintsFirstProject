@@ -25,7 +25,7 @@ def get_llm(model_name=PRIMARY_MODEL):
     return llm
 
 @retry(
-    stop=stop_after_attempt(3),
+    stop=stop_after_attempt(2),
     retry=retry_if_exception_type(Exception),
     reraise=True
 )

@@ -17,7 +17,8 @@ def get_qdrant_client() -> QdrantClient:
         logger.info(f"Connecting to Qdrant at endpoint: {VECTOREDB_ENDPOINT}")
         return QdrantClient(
             url=VECTOREDB_ENDPOINT,
-            api_key=VECTOREDB_API_KEY
+            api_key=VECTOREDB_API_KEY,
+            timeout=60.0
         )
     else:
         local_db_path = os.path.join("data", "qdrant_db")

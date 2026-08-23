@@ -1,0 +1,78 @@
+[
+  {
+    "test_id": 1,
+    "timestamp": "2026-08-23T17:33:43.906471",
+    "retrieval_question": "What is the difference between an asset and a liability?",
+    "chunks_got": [
+      {
+        "page_number": 49,
+        "section_title": "who controls the past controls the future, who controls the present controls the past.",
+        "text": "nd liabilities have been defined through pictures, it may be easier to understand my definitions in words. An asset is something that puts money in my"
+      },
+      {
+        "page_number": 49,
+        "section_title": "who controls the past controls the future, who controls the present controls the past.",
+        "text": "The above box is an Income Statement, often called a Profit and Loss Statement. It measures income and expenses. Money in and money out. The bottom di"
+      },
+      {
+        "page_number": 49,
+        "section_title": "who controls the past controls the future, who controls the present controls the past.",
+        "text": "words \"asset\" and \"liability\" in the dictionary. Now it may make sense to trained accountants, but to the average person, it may as well be written in"
+      },
+      {
+        "page_number": 48,
+        "section_title": "who controls the past controls the future, who controls the present controls the past.",
+        "text": "d my favorite TV show on Friday night. I nearly went crazy trying to read the manual. Nothing in my world is more complex than learning how to program"
+      },
+      {
+        "page_number": 47,
+        "section_title": "who controls the past controls the future, who controls the present controls the past.",
+        "text": "education. We focus on the word \"literacy\" and not \"financial literacy.\" What defines something to be an asset, or something to be a liability are not"
+      }
+    ],
+    "draft_answer": "Based on the provided passages, the difference between an asset and a liability is defined as follows:\n\n* **Asset:** An asset is something that puts money in your pocket [Page 49]. Furthermore, the rich focus on acquiring assets [Page 48, Page 49].\n* **Liability:** A liability is something that takes money out of your pocket [Page 49]. The poor and middle class tend to acquire liabilities [Page 48, Page 49].",
+    "reviewer_verdict": "APPROVED",
+    "reviewer_feedback": "",
+    "final_output": "Based on the provided passages, the difference between an asset and a liability is defined as follows:\n\n* **Asset:** An asset is something that puts money in your pocket [Page 49]. Furthermore, the rich focus on acquiring assets [Page 48, Page 49].\n* **Liability:** A liability is something that takes money out of your pocket [Page 49]. The poor and middle class tend to acquire liabilities [Page 48, Page 49].",
+    "iterations": 1,
+    "is_refusal": false
+  },
+  {
+    "test_id": 1,
+    "timestamp": "2026-08-23T17:33:50.680815",
+    "retrieval_question": "What is the capital city of France?",
+    "chunks_got": [
+      {
+        "page_number": 94,
+        "section_title": "who controls the past controls the future, who controls the present controls the past.",
+        "text": "at gave America strength, and America soon emerged as a world power. Failure inspires winners. And failure defeats losers. It is the biggest secret of"
+      },
+      {
+        "page_number": 66,
+        "section_title": "who controls the past controls the future, who controls the present controls the past.",
+        "text": "rue luxury is a reward for investing in and developing a real asset. For example, when my wife and I had extra money coming from our apartment houses,"
+      },
+      {
+        "page_number": 12,
+        "section_title": "who controls the past controls the future, who controls the present controls the past.",
+        "text": "e other is a question. One lets you off the hook, and the other forces you to think. My soon-to-be-rich dad would explain that by automatically saying"
+      },
+      {
+        "page_number": 69,
+        "section_title": "who controls the past controls the future, who controls the present controls the past.",
+        "text": "rich always found a way to outsmart them. That is how taxes were eventually levied on the middle class. The rich outsmarted the intellectuals, solely "
+      },
+      {
+        "page_number": 80,
+        "section_title": "Lesson Six:Work to Learn -  Don't Work for Money",
+        "text": "n reply.  \"What holds you back from achieving your dream?\" \"My work does not seem to go anywhere,\" she said quietly. \"Everyone says that my novels are"
+      }
+    ],
+    "draft_answer": "I am sorry, but the provided document set does not contain information to answer this question.",
+    "reviewer_verdict": "APPROVED",
+    "reviewer_feedback": "",
+    "final_output": "I am sorry, but the provided document set does not contain information to answer this question.",
+    "iterations": 1,
+    "is_refusal": true
+  }
+]
