@@ -62,7 +62,16 @@ def research_question(
     response = safe_llm_invoke(llm, prompt)
     draft_text = extract_text_content(response).strip()
 
-    is_refusal = STANDARD_REFUSAL_MESSAGE.lower() in draft_text.lower() or "cannot answer" in draft_text.lower()
+    refusal_keywords = [
+        STANDARD_REFUSAL_MESSAGE.lower(),
+        "cannot answer",
+        "not mentioned",
+        "does not contain",
+        "no information",
+        "unable to answer",
+        "not provided in the context"
+    ]
+    is_refusal = any(kw in draft_text.lower() for kw in refusal_keywords)
 
     logger.info(f"[Agent 1: Researcher] Draft generated ({len(draft_text)} chars, Refusal={is_refusal}).")
     return ResearchOutput(

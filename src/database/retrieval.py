@@ -22,6 +22,9 @@ def rerank_passages(query: str, candidate_passages: List[SourcePassage], top_k: 
         return []
 
     if len(candidate_passages) <= top_k:
+        for p in candidate_passages:
+            if p.rerank_score == 0.0:
+                p.rerank_score = p.vector_score
         return sorted(candidate_passages, key=lambda p: p.score, reverse=True)
 
     passages_text_formatted = []
@@ -55,18 +58,26 @@ Do NOT include any markdown formatting, explanation, or code blocks outside the 
 
         for idx, passage in enumerate(candidate_passages, start=1):
             str_idx = str(idx)
+            rerank_val = None
             if str_idx in scores_dict:
-                reranked_score = float(scores_dict[str_idx])
-                passage.score = round(reranked_score, 4)
+                rerank_val = float(scores_dict[str_idx])
             elif idx in scores_dict:
-                reranked_score = float(scores_dict[idx])
-                passage.score = round(reranked_score, 4)
+                rerank_val = float(scores_dict[idx])
+            
+            if rerank_val is not None:
+                passage.rerank_score = round(rerank_val, 4)
+                passage.score = round(rerank_val, 4)
+            else:
+                passage.rerank_score = passage.vector_score
 
         reranked_passages = sorted(candidate_passages, key=lambda p: p.score, reverse=True)
         return reranked_passages[:top_k]
 
     except Exception as e:
         logger.warning(f"LLM Reranking failed due to: {e}. Falling back to Qdrant vector similarity ranking.")
+        for p in candidate_passages:
+            p.rerank_score = p.vector_score
+            p.score = p.vector_score
         sorted_passages = sorted(candidate_passages, key=lambda p: p.score, reverse=True)
         return sorted_passages[:top_k]
 
@@ -105,7 +116,9 @@ def search_passages(
             text=payload.get("text", ""),
             page_number=payload.get("page_number", 0),
             section_title=payload.get("section_title", "General"),
-            score=score
+            score=round(score, 4),
+            vector_score=round(score, 4),
+            rerank_score=0.0
         )
         candidate_passages.append(passage)
 

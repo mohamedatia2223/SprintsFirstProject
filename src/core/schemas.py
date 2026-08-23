@@ -6,7 +6,9 @@ class SourcePassage(BaseModel):
     text: str = Field(description="Content text snippet of the chunk.")
     page_number: int = Field(default=0, description="PDF page number of the source chunk.")
     section_title: str = Field(default="General", description="Section or chapter heading.")
-    score: float = Field(default=0.0, description="Similarity score from Qdrant vector search.")
+    score: float = Field(default=0.0, description="Composite/primary score.")
+    vector_score: float = Field(default=0.0, description="Similarity score from Qdrant vector search.")
+    rerank_score: float = Field(default=0.0, description="Relevance score from LLM cross-encoder reranker.")
 
 
 class ResearchOutput(BaseModel):

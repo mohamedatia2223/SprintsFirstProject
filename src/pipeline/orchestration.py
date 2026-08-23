@@ -103,6 +103,8 @@ orchestrator_graph = build_orchestration_graph()
 
 
 def run_assistant(question: str, max_iterations: int = 2) -> AgentState:
+    validated_max_iterations = max(1, max_iterations)
+
     initial_state = {
         "question": question,
         "passages": [],
@@ -110,7 +112,7 @@ def run_assistant(question: str, max_iterations: int = 2) -> AgentState:
         "reviewer_verdict": "PENDING",
         "reviewer_feedback": "",
         "iteration_count": 0,
-        "max_iterations": max_iterations,
+        "max_iterations": validated_max_iterations,
         "final_answer": "",
         "is_refusal": False
     }
@@ -121,7 +123,15 @@ def run_assistant(question: str, max_iterations: int = 2) -> AgentState:
 
     final_state_dict = orchestrator_graph.invoke(initial_state)
 
-    final_ans = final_state_dict.get("final_answer") or final_state_dict.get("draft_answer") or ""
+    verdict = final_state_dict.get("reviewer_verdict", "PENDING")
+    is_refusal = final_state_dict.get("is_refusal", False)
+
+    if verdict == "APPROVED" or is_refusal:
+        final_ans = final_state_dict.get("final_answer") or final_state_dict.get("draft_answer") or ""
+    else:
+        logger.warning("[Orchestrator] Reviewer rejected final draft after max iterations. Suppressing draft answer.")
+        final_ans = "I apologize, but I am unable to provide a verified response for this question as the generated draft could not pass accuracy review."
+        is_refusal = True
 
     passages_list = [SourcePassage(**p) if isinstance(p, dict) else p for p in final_state_dict.get("passages", [])]
 
@@ -129,12 +139,12 @@ def run_assistant(question: str, max_iterations: int = 2) -> AgentState:
         question=question,
         passages=passages_list,
         draft_answer=final_state_dict.get("draft_answer", ""),
-        reviewer_verdict=final_state_dict.get("reviewer_verdict", "APPROVED"),
+        reviewer_verdict=verdict,
         reviewer_feedback=final_state_dict.get("reviewer_feedback", ""),
         iteration_count=final_state_dict.get("iteration_count", 1),
-        max_iterations=max_iterations,
+        max_iterations=validated_max_iterations,
         final_answer=final_ans,
-        is_refusal=final_state_dict.get("is_refusal", False)
+        is_refusal=is_refusal
     )
 
     chunks_got = [
