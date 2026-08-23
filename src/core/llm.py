@@ -1,22 +1,63 @@
 import logging
+from google import genai
 from langchain_google_genai import ChatGoogleGenerativeAI
-from src.core.config import LLM_API_KEY
 from tenacity import retry, stop_after_attempt, retry_if_exception_type
+from src.core.config import (
+    LLM_API_KEY, 
+    PRIMARY_MODEL as DEFAULT_PRIMARY,
+    SECONDARY_MODEL as DEFAULT_SECONDARY,
+    TERTIARY_MODEL as DEFAULT_TERTIARY
+)
 
 logger = logging.getLogger(__name__)
 
-PRIMARY_MODEL = "gemini-3.5-flash"
-SECONDARY_MODEL = "gemini-2.5-flash"
-TERTIARY_MODEL = "gemini-3.1-flash-lite"
+PRIMARY_MODEL = DEFAULT_PRIMARY
+SECONDARY_MODEL = DEFAULT_SECONDARY
+TERTIARY_MODEL = DEFAULT_TERTIARY
 
 FALLBACK_CHAIN = [PRIMARY_MODEL, SECONDARY_MODEL, TERTIARY_MODEL]
+
+
+def set_llm_models(primary: str = None, secondary: str = None, tertiary: str = None):
+
+    global PRIMARY_MODEL, SECONDARY_MODEL, TERTIARY_MODEL, FALLBACK_CHAIN
+    if primary:
+        PRIMARY_MODEL = primary
+    if secondary:
+        SECONDARY_MODEL = secondary
+    if tertiary:
+        TERTIARY_MODEL = tertiary
+        
+    FALLBACK_CHAIN = [PRIMARY_MODEL, SECONDARY_MODEL, TERTIARY_MODEL]
+    logger.info(f"Updated LLM Fallback Chain: {FALLBACK_CHAIN}")
+
+
+def list_available_gemini_models() -> list[str]:
+
+    if not LLM_API_KEY:
+        return [PRIMARY_MODEL, SECONDARY_MODEL, TERTIARY_MODEL]
+        
+    try:
+        client = genai.Client(api_key=LLM_API_KEY)
+        models = [
+            m.name.replace("models/", "") 
+            for m in client.models.list() 
+            if "gemini" in m.name.lower() and "embed" not in m.name.lower()
+        ]
+        return models if models else [PRIMARY_MODEL, SECONDARY_MODEL, TERTIARY_MODEL]
+    except Exception as e:
+        logger.warning(f"Could not fetch available models from Google API: {e}")
+        return [PRIMARY_MODEL, SECONDARY_MODEL, TERTIARY_MODEL]
+
 
 class LlmApiException(Exception):
     pass
 
-def get_llm(model_name=PRIMARY_MODEL):
+
+def get_llm(model_name=None):
+    target_model = model_name or PRIMARY_MODEL
     llm = ChatGoogleGenerativeAI(
-        model=model_name,
+        model=target_model,
         google_api_key=LLM_API_KEY,
         temperature=0.2,
         max_output_tokens=10000,

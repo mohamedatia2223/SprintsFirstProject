@@ -91,6 +91,24 @@ def voice_to_text_endpoint():
             os.remove(temp_file_path)
 
 
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({
+        "status": "ok",
+        "service": "Sprints Multi-Agent Assistant API",
+        "version": "1.0.0"
+    }), 200
+
+
+@app.route("/health", methods=["GET"])
+def health_check():
+    return jsonify({
+        "status": "ok",
+        "service": "Sprints Multi-Agent Assistant API",
+        "version": "1.0.0"
+    }), 200
+
+
 @app.route("/api/text-to-voice", methods=["POST"])
 def text_to_voice_endpoint():
     """
