@@ -22,65 +22,102 @@ DEFAULT_CHUNK_OVERLAP = 150
 
 def parse_markdown_into_chunks(
     markdown_text: str, 
-    chunk_size: int = DEFAULT_CHUNK_SIZE, 
-    overlap: int = DEFAULT_CHUNK_OVERLAP
+    chunk_size: int = 800, 
+    overlap: int = 150
 ) -> List[Dict[str, Any]]:
 
     chunks = []
+    lines = markdown_text.splitlines()
     
-    parts = re.split(r'<!-- Page (\d+) -->', markdown_text)
-    
+    current_page = 1
     current_section = "General"
     
-    if len(parts) < 3:
-        page_tuples = [(1, markdown_text)]
-    else:
-        page_tuples = []
-        for i in range(1, len(parts), 2):
-            page_num = int(parts[i])
-            page_content = parts[i+1] if i+1 < len(parts) else ""
-            page_tuples.append((page_num, page_content))
+    blocks = []
+    current_block_lines = []
+    block_start_page = 1
 
-    for page_num, page_content in page_tuples:
-        lines = page_content.splitlines()
-        page_text_blocks = []
+    for line in lines:
+        stripped = line.strip()
         
-        for line in lines:
-            stripped = line.strip()
-            if stripped.startswith("#"):
-                current_section = re.sub(r'^#+\s*', '', stripped)
-            elif stripped and not stripped.startswith("---"):
-                page_text_blocks.append(stripped)
-
-        clean_page_text = " ".join(page_text_blocks)
-        if not clean_page_text:
+        # Detect page marker
+        page_match = re.match(r'<!-- Page (\d+) -->', stripped)
+        if page_match:
+            current_page = int(page_match.group(1))
             continue
 
-        start = 0
-        text_length = len(clean_page_text)
-
-        while start < text_length:
-            end = min(start + chunk_size, text_length)
-            
-            if end < text_length:
-                next_space = clean_page_text.rfind(' ', start, end)
-                if next_space > start + (chunk_size // 2):
-                    end = next_space
-
-            chunk_str = clean_page_text[start:end].strip()
-
-            if chunk_str:
-                chunks.append({
-                    "text": chunk_str,
-                    "page_number": page_num,
-                    "section_title": current_section,
-                    "char_count": len(chunk_str)
+        # Detect section header
+        if stripped.startswith("#"):
+            if current_block_lines:
+                blocks.append({
+                    "text": " ".join(current_block_lines),
+                    "page_number": block_start_page,
+                    "section_title": current_section
                 })
+                current_block_lines = []
+            current_section = re.sub(r'^#+\s*', '', stripped)
+            block_start_page = current_page
+            continue
 
-            if end >= text_length:
-                break
+        if not stripped or stripped.startswith("---"):
+            if current_block_lines:
+                blocks.append({
+                    "text": " ".join(current_block_lines),
+                    "page_number": block_start_page,
+                    "section_title": current_section
+                })
+                current_block_lines = []
+                block_start_page = current_page
+            continue
 
-            start = end - overlap
+        if not current_block_lines:
+            block_start_page = current_page
+        current_block_lines.append(stripped)
+
+    if current_block_lines:
+        blocks.append({
+            "text": " ".join(current_block_lines),
+            "page_number": block_start_page,
+            "section_title": current_section
+        })
+
+    current_chunk_text = ""
+    current_chunk_page = 1
+    current_chunk_section = "General"
+    
+    for b in blocks:
+        if not current_chunk_text:
+            current_chunk_text = b["text"]
+            current_chunk_page = b["page_number"]
+            current_chunk_section = b["section_title"]
+        elif len(current_chunk_text) + len(b["text"]) + 2 <= chunk_size:
+            current_chunk_text += "\n\n" + b["text"]
+        else:
+            chunks.append({
+                "text": current_chunk_text.strip(),
+                "page_number": current_chunk_page,
+                "section_title": current_chunk_section,
+                "char_count": len(current_chunk_text)
+            })
+            
+            if len(current_chunk_text) > overlap:
+                overlap_text = current_chunk_text[-overlap:]
+                space_idx = overlap_text.find(" ")
+                if space_idx != -1 and space_idx < len(overlap_text) - 10:
+                    overlap_text = overlap_text[space_idx + 1:]
+            else:
+                overlap_text = current_chunk_text
+
+            current_chunk_text = overlap_text + "\n\n" + b["text"]
+            current_chunk_page = b["page_number"]
+            current_chunk_section = b["section_title"]
+
+    if current_chunk_text.strip():
+        chunks.append({
+            "text": current_chunk_text.strip(),
+            "page_number": current_chunk_page,
+            "section_title": current_chunk_section,
+            "char_count": len(current_chunk_text)
+        })
 
     return chunks
 
@@ -143,9 +180,15 @@ def ingest_document(
         client.upsert(collection_name=collection_name, points=points)
         total_ingested += len(points)
         logger.info(f"Upserted {total_ingested}/{len(chunks)} points to Qdrant.")
-        time.sleep(1.5) 
+        time.sleep(3.0) 
 
     logger.info(f"Successfully completed ingestion of {total_ingested} points into Qdrant collection '{collection_name}'.")
     return total_ingested
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    ingest_document()
+
 
 
