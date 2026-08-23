@@ -1,8 +1,13 @@
+import sys
+import os
+import time
+import logging
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from google import genai
 from src.core.config import LLM_API_KEY
 from src.core.llm import FALLBACK_CHAIN, PRIMARY_MODEL, LlmApiException
-import time
-import logging
 
 logger = logging.getLogger(__name__)
 client = genai.Client(api_key=LLM_API_KEY)

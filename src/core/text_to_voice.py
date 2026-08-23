@@ -1,4 +1,9 @@
+import sys
+import os
 import logging
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 from google import genai
 from google.genai import types
 from src.core.config import LLM_API_KEY

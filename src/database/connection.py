@@ -1,11 +1,64 @@
+import sys
 import os
-from sqlalchemy import create_engine
+import logging
+from qdrant_client import QdrantClient
+from qdrant_client.http import models
 
-os.makedirs("data", exist_ok=True)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-TEACHER_DB_PATH = os.path.join("data", "ai_teacher_vec.db")
+from src.core.config import VECTOREDB_ENDPOINT, VECTOREDB_API_KEY
 
-teacher_engine = create_engine(f"sqlite:///{TEACHER_DB_PATH}")
+logger = logging.getLogger(__name__)
 
-def get_teacher_engine():
-    return teacher_engine
+
+def get_qdrant_client() -> QdrantClient:
+
+    if VECTOREDB_ENDPOINT:
+        logger.info(f"Connecting to Qdrant at endpoint: {VECTOREDB_ENDPOINT}")
+        return QdrantClient(
+            url=VECTOREDB_ENDPOINT,
+            api_key=VECTOREDB_API_KEY
+        )
+    else:
+        local_db_path = os.path.join("data", "qdrant_db")
+        os.makedirs(local_db_path, exist_ok=True)
+        logger.info(f"No VECTOREDB_ENDPOINT found in env. Falling back to local Qdrant at: {local_db_path}")
+        return QdrantClient(path=local_db_path)
+
+
+def init_collection(
+    collection_name: str, 
+    vector_size: int = 3072, 
+    distance: str = "Cosine", 
+    recreate: bool = False
+) -> bool:
+
+    client = get_qdrant_client()
+    
+    distance_mapping = {
+        "cosine": models.Distance.COSINE,
+        "dot": models.Distance.DOT,
+        "euclid": models.Distance.EUCLID
+    }
+    dist_enum = distance_mapping.get(distance.lower(), models.Distance.COSINE)
+
+    collections = [c.name for c in client.get_collections().collections]
+    
+    if collection_name in collections:
+        if recreate:
+            logger.info(f"Recreating existing collection '{collection_name}'...")
+            client.delete_collection(collection_name=collection_name)
+        else:
+            logger.info(f"Collection '{collection_name}' already exists.")
+            return True
+
+    logger.info(f"Creating Qdrant collection '{collection_name}' (dim={vector_size}, distance={distance})...")
+    client.create_collection(
+        collection_name=collection_name,
+        vectors_config=models.VectorParams(
+            size=vector_size,
+            distance=dist_enum
+        )
+    )
+    return True
+
