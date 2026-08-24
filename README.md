@@ -1,33 +1,33 @@
-# 📚 Multi-Agent RAG Assistant & Fact-Checking Assistant
+# Multi-Agent RAG Assistant & Fact-Checking Assistant
 > **Sprints Practice Task 0** | Two-Agent Document Q&A Assistant with Qdrant Vector Retrieval, Fact-Checking Reviewer, and Voice Capabilities.
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
-- **🤖 Multi-Agent Orchestration (`LangGraph`)**:
+- **Multi-Agent Orchestration (`LangGraph`)**:
   - **Agent 1 (Researcher)**: Searches Qdrant vector database, extracts context passages, and drafts cited responses.
   - **Agent 2 (Reviewer)**: Strict fact-checking auditor that verifies draft statements against source passages to prevent hallucinations.
-- **🚨 Leak-Proof Refusal Guardrail**:
+- **Leak-Proof Refusal Guardrail**:
   - If Agent 2 rejects a draft answer after maximum revision attempts, unverified drafts are suppressed and a standard refusal message (*"I am sorry, but the provided document set does not contain information to answer this question."*) is returned.
-- **⚡ Flexible Model Selection & Dynamic Failover Chain**:
+- **Flexible Model Selection & Dynamic Failover Chain**:
   - Full model selection flexibility: choose any Gemini model (e.g., `gemini-3.1-flash-lite`, `gemini-3.5-flash`, `gemini-2.5-flash`) dynamically via the Streamlit sidebar or `.env` configuration.
   - Automatic rate limit / quota overload failovers: `gemini-3.1-flash-lite` → `gemini-3.5-flash-lite` → `gemini-2.5-flash`.
-- **🔊 Multi-Modal Voice Features**:
+- **Multi-Modal Voice Features**:
   - **Voice-to-Text**: Speech transcription using Google Gemini multimodal capabilities.
   - **Text-to-Voice**: Generates natural speech audio (`WAV`) output using Gemini TTS models (`Puck` voice).
-- **🖥️ Dual Interfaces**:
+- **Dual Interfaces**:
   - **Streamlit App (`src/app/chatStreamlit.py`)**: Interactive web UI with model selection, chat history, source expanders, and mic recording.
   - **Flask REST API (`src/app/main.py`)**: REST endpoints for `/api/chat`, `/api/voice-to-text`, and `/api/text-to-voice`.
-- **📝 PDF-to-Markdown Token Optimization**:
+- **PDF-to-Markdown Token Optimization**:
   - Automatically converts raw PDF files (`.pdf`) into structured, clean Markdown (`.md`) with explicit page markers (`<!-- Page N -->`) and header hierarchies before chunking.
   - Eliminates unnecessary binary noise, headers/footers, and duplicate whitespace, **drastically saving token usage** during LLM retrieval, reranking, and prompting.
-- **📊 100-Test Benchmark Harness (`testScripts/generate_100_tests.py`)**:
+- **100-Test Benchmark Harness (`testScripts/generate_100_tests.py`)**:
   - Rigorous evaluation suite (70 in-domain + 30 out-of-domain questions) measuring execution success, refusal precision, and supported answer accuracy.
 
 ---
 
-## 📊 Benchmark Evaluation Results
+## Benchmark Evaluation Results
 
 | Metric | Score | Details |
 | :--- | :---: | :--- |
@@ -39,7 +39,7 @@
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Frameworks & Agents**: Python 3.11+, LangGraph, LangChain
 - **LLM Provider**: Google GenAI (`gemini-3.1-flash-lite`, `gemini-3.5-flash-lite`, `gemini-2.5-flash`)
@@ -50,7 +50,7 @@
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 Sprints/
@@ -93,7 +93,7 @@ Sprints/
 
 ---
 
-## 🚀 Quickstart Guide
+## Quickstart Guide
 
 ### 1. Prerequisites & Installation
 
@@ -121,7 +121,7 @@ TERTIARY_MODEL = gemini-2.5-flash
 
 ---
 
-## 💻 Running the Application
+## Running the Application
 
 ### Option A: Launch Streamlit Web UI
 
@@ -144,7 +144,7 @@ The API server runs at `http://localhost:5000`.
 
 ---
 
-## 📥 Document Ingestion Pipeline
+## Document Ingestion Pipeline
 
 The document ingestion pipeline uses a two-step process optimized for accuracy and token efficiency:
 
@@ -159,7 +159,7 @@ python src/pipeline/ingestion.py
 
 ---
 
-## 🧪 Benchmark Evaluation Suite
+## Benchmark Evaluation Suite
 
 To run the complete 100-test benchmark suite:
 
@@ -171,6 +171,6 @@ Results will be evaluated and saved to `logs/test_runs.json`.
 
 ---
 
-## 📜 License
+## License
 
 This project is released under the MIT License.
