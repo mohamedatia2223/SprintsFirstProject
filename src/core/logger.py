@@ -58,7 +58,9 @@ def log_test_case(
     if os.path.exists(TEST_RUNS_JSON_PATH):
         try:
             with open(TEST_RUNS_JSON_PATH, "r", encoding="utf-8") as f:
-                existing_entries = json.load(f)
+                data = json.load(f)
+                if isinstance(data, list):
+                    existing_entries = data
         except Exception:
             existing_entries = []
 

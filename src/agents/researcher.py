@@ -21,7 +21,7 @@ def research_question(
     question: str, 
     reviewer_feedback: str = "", 
     top_k: int = 5,
-    score_threshold: float = 0.4
+    score_threshold: float = 0.30
 ) -> ResearchOutput:
 
     if not question or not question.strip():

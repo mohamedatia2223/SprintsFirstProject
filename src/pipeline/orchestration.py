@@ -12,6 +12,8 @@ from src.agents.reviewer import review_draft_answer
 from src.core.schemas import AgentState, SourcePassage
 from src.core.logger import log_test_case
 
+from src.core.prompts import STANDARD_REFUSAL_MESSAGE
+
 logger = logging.getLogger(__name__)
 
 
@@ -126,11 +128,13 @@ def run_assistant(question: str, max_iterations: int = 2) -> AgentState:
     verdict = final_state_dict.get("reviewer_verdict", "PENDING")
     is_refusal = final_state_dict.get("is_refusal", False)
 
-    if verdict == "APPROVED" or is_refusal:
+    if is_refusal:
+        final_ans = final_state_dict.get("final_answer") or final_state_dict.get("draft_answer") or STANDARD_REFUSAL_MESSAGE
+    elif verdict == "APPROVED":
         final_ans = final_state_dict.get("final_answer") or final_state_dict.get("draft_answer") or ""
     else:
         logger.warning("[Orchestrator] Reviewer rejected final draft after max iterations. Suppressing draft answer.")
-        final_ans = "I apologize, but I am unable to provide a verified response for this question as the generated draft could not pass accuracy review."
+        final_ans = STANDARD_REFUSAL_MESSAGE
         is_refusal = True
 
     passages_list = [SourcePassage(**p) if isinstance(p, dict) else p for p in final_state_dict.get("passages", [])]

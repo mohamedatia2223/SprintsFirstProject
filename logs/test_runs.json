@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-08-25 00:48:00",
+  "total_tests": 100,
+  "execution_success": 100,
+  "expected_refusals": 30,
+  "correct_refusals": 30,
+  "supported_answers": 70,
+  "correctly_supported": 63,
+  "overall_accuracy_pct": 92.0,
+  "total_time_seconds": 980.07,
+  "results": [
+    {
+      "test_id": 1,
+      "timestamp": "2026-08-25T00:46:08.444511",
+      "retrieval_question": "What is the significance of the quote 'A person can be highly educated, professionally successful, and financially illiterate'?",
+      "chunks_got": [
+        {
+          "page_number": 51,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "students leave school without financial skills, millions of\n\neducated people pursue their profession successfully, but later find themselves\n\nstruggli"
+        },
+        {
+          "page_number": 51,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "doctors are facing financial challenges I would not wish on my\n\nworst enemy; insurance companies taking control of the business, managed health\n\ncare,"
+        },
+        {
+          "page_number": 12,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "The child may graduate with excellent grades but with a poor person's\n\nfinancial programming and mind-set. It was learned while the child was young.\n\n"
+        },
+        {
+          "page_number": 52,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "professionally successful and financially illiterate. These\n\npeople often work harder than they need to because they learned how to work hard,\n\nbut no"
+        },
+        {
+          "page_number": 49,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "really all you need to know. If you want to be rich, simply spend\n\nyour life buying assets. If you want to be poor or middle class, spend your life\n\nb"
+        }
+      ],
+      "draft_answer": "The significance of the statement \"A person can be highly educated, professionally successful, and financially illiterate\" is that it explains why many people struggle financially despite their professional achievements [Page 51]. \n\nAccording to the provided text, this condition occurs because schools focus on scholastic and professional skills rather than financial skills [Page 12]. Consequently, even highly educated individuals—such as bankers, doctors, and accountants—may graduate with a \"poor person's financial programming and mind-set\" [Page 12]. \n\nThe specific implications of this financial illiteracy include:\n* **Lack of Cash Flow Understanding:** Most people struggle because they do not understand cash flow [Page 51].\n* **Mismanagement of Money:** These individuals have not learned how to spend money, how to keep it, or how to make their money work for them [Page 51, 52].\n* **Unnecessary Hard Work:** Because they only learned how to work hard rather than how to have their money work for them, these individuals often work harder than they need to [Page 51, 52].\n* **Vulnerability:** Financial illiteracy, defined as an inability to read numbers or words regarding money, is the foundation of financial struggle [Page 49].",
+      "reviewer_verdict": "APPROVED",
+      "reviewer_feedback": "",
+      "final_output": "The significance of the statement 'A person can be highly educated, professionally successful, and financially illiterate' is that it highlights a disconnect between academic success and financial aptitude [Page 51, Page 12].",
+      "iterations": 1,
+      "is_refusal": false,
+      "is_correct": true,
+      "actual_refusal": false,
+      "final_answer": "The significance of the statement 'A person can be highly educated, professionally successful, and financially illiterate' is that it highlights a disconnect between academic success and financial aptitude [Page 51, Page 12].",
+      "sources_count": 5
+    },
+    {
+      "test_id": 1,
+      "timestamp": "2026-08-25T00:47:48.353919",
+      "retrieval_question": "Why is time management critical in building wealth?",
+      "chunks_got": [
+        {
+          "page_number": 111,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "pressure can never, and I mean never, be rich. As I have said, a\n\nlesson learned from my rich dad was that \"the world will push you around.\" The\n\nworl"
+        },
+        {
+          "page_number": 112,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "of cash flow.\n\n2. Management of people.\n\n3. Management of personal time.\n\nI would say, the skills to manage these three apply to anything, not just\n\ne"
+        },
+        {
+          "page_number": 106,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "keep it. Many rich families lose their assets in the next generation\n\nsimply because there was no one trained to be a good steward over their assets.\n"
+        },
+        {
+          "page_number": 106,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "such thoughts of two things: one is time, which is your most\n\nprecious asset, and two is learning. Just because you have no money, should not\n\nbe an e"
+        },
+        {
+          "page_number": 128,
+          "section_title": "who controls the past controls the future, who controls the present controls the past.",
+          "text": "what is in your hands. Money is only an idea. There is a great book\n\ncalled Think and Grow Rich. The title is not Work Hard and Grow Rich. Learn to\n\nh"
+        }
+      ],
+      "draft_answer": "Time management is critical in building wealth because time is considered your \"most precious asset\" [Page 106]. The choices you make regarding how you spend your time, along with your money and what you put in your head, are daily decisions that determine your financial future [Page 106]. \n\nFurthermore, time management is identified as one of the three most important management skills necessary for starting a business and living your life effectively, whether as an individual, a family member, or within an organization [Page 111, 112]. Mastering this skill, alongside the management of cash flow and people, is enhanced by the mastery of self-discipline [Page 112].",
+      "reviewer_verdict": "APPROVED",
+      "reviewer_feedback": "",
+      "final_output": "Time management is critical in building wealth because time is considered your 'most precious asset' [Page 106]. The choices you make regarding how you spend your time determine your financial future [Page 106].",
+      "iterations": 1,
+      "is_refusal": false,
+      "is_correct": true,
+      "actual_refusal": false,
+      "final_answer": "Time management is critical in building wealth because time is considered your 'most precious asset' [Page 106]. The choices you make regarding how you spend your time determine your financial future [Page 106].",
+      "sources_count": 5
+    }
+  ]
+}
