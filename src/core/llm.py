@@ -2,12 +2,9 @@ import logging
 from google import genai
 from langchain_google_genai import ChatGoogleGenerativeAI
 from tenacity import retry, stop_after_attempt, retry_if_exception_type
-from src.core.config import (
-    LLM_API_KEY, 
-    PRIMARY_MODEL as DEFAULT_PRIMARY,
-    SECONDARY_MODEL as DEFAULT_SECONDARY,
-    TERTIARY_MODEL as DEFAULT_TERTIARY
-)
+from src.core.config import (LLM_API_KEY, PRIMARY_MODEL as DEFAULT_PRIMARY,SECONDARY_MODEL as DEFAULT_SECONDARY,TERTIARY_MODEL as DEFAULT_TERTIARY)
+
+from src.core.exceptions import LlmApiException, handle_api_exception
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +13,6 @@ SECONDARY_MODEL = DEFAULT_SECONDARY
 TERTIARY_MODEL = DEFAULT_TERTIARY
 
 FALLBACK_CHAIN = [PRIMARY_MODEL, SECONDARY_MODEL, TERTIARY_MODEL]
-
 
 def set_llm_models(primary: str = None, secondary: str = None, tertiary: str = None):
 
@@ -48,10 +44,6 @@ def list_available_gemini_models() -> list[str]:
     except Exception as e:
         logger.warning(f"Could not fetch available models from Google API: {e}")
         return [PRIMARY_MODEL, SECONDARY_MODEL, TERTIARY_MODEL]
-
-
-class LlmApiException(Exception):
-    pass
 
 
 def get_llm(model_name=None):
@@ -103,18 +95,11 @@ def safe_llm_invoke(llm, messages):
                     current_model = next_model
                     e = fallback_err
             
-            raise LlmApiException(
-                "All primary and fallback AI services are currently overloaded. Please try again later."
-            ) from e
-        elif "token" in error_str or "maximum context length" in error_str:
-            raise LlmApiException("The response exceeded the maximum token limit. Please ask a more specific question.") from e
-        elif any(auth_kw in error_str for auth_kw in ["401", "403", "invalid api key", "unauthorized", "forbidden"]):
-            raise LlmApiException("Authentication issue with the AI service. Please check API credentials.") from e
-        else:
-            raise LlmApiException(f"An unexpected AI service error occurred (check the API): {str(e)}") from e
+            raise handle_api_exception(e, service_name="AI service", is_overloaded=True) from e
+        
+        raise handle_api_exception(e, service_name="AI service") from e
 
 def extract_text_content(message_obj):
-
     content = message_obj.content
     if isinstance(content, str):
         return content

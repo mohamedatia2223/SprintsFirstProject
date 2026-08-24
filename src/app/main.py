@@ -5,20 +5,19 @@ import tempfile
 import logging
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-
 from src.pipeline.orchestration import run_assistant
 from src.core.voice_to_text import convert_audio_text
 from src.core.text_to_voice import convert_text_to_audio
-from src.core.llm import LlmApiException
+from src.core.exceptions import LlmApiException
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
-
 
 
 @app.route("/api/chat", methods=["POST"])
@@ -64,9 +63,7 @@ def chat_endpoint():
 
 @app.route("/api/voice-to-text", methods=["POST"])
 def voice_to_text_endpoint():
-    """
-    Audio Transcription Endpoint: Upload an audio file to convert to text.
-    """
+
     if "file" not in request.files:
         return jsonify({"error": "No audio file provided in form field 'file'."}), 400
 
@@ -74,7 +71,6 @@ def voice_to_text_endpoint():
     if audio_file.filename == "":
         return jsonify({"error": "Selected file is empty."}), 400
 
-    # Save to temporary file
     temp_dir = tempfile.gettempdir()
     temp_file_path = os.path.join(temp_dir, f"input_{audio_file.filename}")
     audio_file.save(temp_file_path)
@@ -91,31 +87,10 @@ def voice_to_text_endpoint():
             os.remove(temp_file_path)
 
 
-@app.route("/", methods=["GET"])
-def home():
-    return jsonify({
-        "status": "ok",
-        "service": "Sprints Multi-Agent Assistant API",
-        "version": "1.0.0"
-    }), 200
-
-
-@app.route("/health", methods=["GET"])
-def health_check():
-    return jsonify({
-        "status": "ok",
-        "service": "Sprints Multi-Agent Assistant API",
-        "version": "1.0.0"
-    }), 200
-
 
 @app.route("/api/text-to-voice", methods=["POST"])
 def text_to_voice_endpoint():
-    """
-    Text-to-Speech Endpoint: Converts input text string to audio stream.
-    
-    Payload: {"text": "...", "voice_name": "Puck"}
-    """
+
     data = request.get_json() or {}
     text = data.get("text", "").strip()
     voice_name = data.get("voice_name", "Puck")

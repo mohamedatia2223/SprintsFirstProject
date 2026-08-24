@@ -1,17 +1,15 @@
 import sys
 import os
 import logging
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from src.core.config import LLM_API_KEY
-from src.core.llm import LlmApiException
+from src.core.exceptions import LlmApiException, handle_api_exception
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 logger = logging.getLogger(__name__)
 
 PRIMARY_EMBEDDING_MODEL = "models/gemini-embedding-001"
-
 
 def get_embedding_model(model_name: str = PRIMARY_EMBEDDING_MODEL) -> GoogleGenerativeAIEmbeddings:
 
@@ -32,15 +30,8 @@ def embed_query(text: str, model_name: str = PRIMARY_EMBEDDING_MODEL) -> list[fl
     try:
         embeddings_model = get_embedding_model(model_name=PRIMARY_EMBEDDING_MODEL)
         return embeddings_model.embed_query(text)
-        
     except Exception as e:
-        error_str = str(e).lower()
-        if "token" in error_str or "maximum context length" in error_str:
-            raise LlmApiException("The text exceeded the maximum token limit for embeddings.") from e
-        elif any(auth_kw in error_str for auth_kw in ["401", "403", "invalid api key", "unauthorized", "forbidden"]):
-            raise LlmApiException("Authentication issue with the embedding service. Please check API credentials.") from e
-        else:
-            raise LlmApiException(f"An unexpected embedding service error occurred: {str(e)}") from e
+        raise handle_api_exception(e, service_name="embedding service") from e
 
 
 def embed_documents(texts: list[str], model_name: str = PRIMARY_EMBEDDING_MODEL) -> list[list[float]]:
@@ -67,14 +58,8 @@ def embed_documents(texts: list[str], model_name: str = PRIMARY_EMBEDDING_MODEL)
                     time.sleep(wait_seconds)
                     continue
                 else:
-                    raise LlmApiException(
-                        "Embedding service is currently overloaded or rate limited. Please try again later."
-                    ) from e
-            elif "token" in error_str or "maximum context length" in error_str:
-                raise LlmApiException("The documents exceeded the maximum token limit for embeddings.") from e
-            elif any(auth_kw in error_str for auth_kw in ["401", "403", "invalid api key", "unauthorized", "forbidden"]):
-                raise LlmApiException("Authentication issue with the embedding service. Please check API credentials.") from e
-            else:
-                raise LlmApiException(f"An unexpected embedding service error occurred: {str(e)}") from e
+                    raise handle_api_exception(e, service_name="embedding service", is_overloaded=True) from e
+
+            raise handle_api_exception(e, service_name="embedding service") from e
 
 

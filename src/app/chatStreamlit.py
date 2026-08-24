@@ -4,7 +4,6 @@ import os
 import logging
 import streamlit as st
 
-# Page Configuration - MUST be first Streamlit command
 st.set_page_config(
     page_title="Sprints Assistant - Rich Dad Poor Dad",
     page_icon="📚",

@@ -3,10 +3,9 @@ import os
 import logging
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
+from src.core.config import VECTOREDB_ENDPOINT, VECTOREDB_API_KEY
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-
-from src.core.config import VECTOREDB_ENDPOINT, VECTOREDB_API_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -20,19 +19,9 @@ def get_qdrant_client() -> QdrantClient:
             api_key=VECTOREDB_API_KEY,
             timeout=60.0
         )
-    else:
-        local_db_path = os.path.join("data", "qdrant_db")
-        os.makedirs(local_db_path, exist_ok=True)
-        logger.info(f"No VECTOREDB_ENDPOINT found in env. Falling back to local Qdrant at: {local_db_path}")
-        return QdrantClient(path=local_db_path)
 
 
-def init_collection(
-    collection_name: str, 
-    vector_size: int = 3072, 
-    distance: str = "Cosine", 
-    recreate: bool = False
-) -> bool:
+def init_collection(collection_name: str, vector_size: int = 3072, distance: str = "Cosine", recreate: bool = False) -> bool:
 
     client = get_qdrant_client()
     

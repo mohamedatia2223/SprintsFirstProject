@@ -3,13 +3,13 @@ import os
 import json
 import logging
 from typing import List
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-
 from src.database.connection import get_qdrant_client
 from src.core.embedding import embed_query
 from src.core.schemas import SourcePassage
 from src.core.llm import get_llm, safe_llm_invoke, extract_text_content
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 
 logger = logging.getLogger(__name__)
 

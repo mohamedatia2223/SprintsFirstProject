@@ -3,13 +3,12 @@ import os
 import logging
 import io
 import wave
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-
 from google import genai
 from google.genai import types
 from src.core.config import LLM_API_KEY
-from src.core.llm import LlmApiException
+from src.core.exceptions import LlmApiException, handle_api_exception
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 PRIMARY_TTS_MODEL = "gemini-2.5-flash-preview-tts"
 SECONDARY_TTS_MODEL = "gemini-2.5-flash-native-audio-latest"
@@ -19,7 +18,6 @@ TTS_FALLBACK_CHAIN = [PRIMARY_TTS_MODEL, SECONDARY_TTS_MODEL, TERTIARY_TTS_MODEL
 
 logger = logging.getLogger(__name__)
 client = genai.Client(api_key=LLM_API_KEY)
-
 
 def _invoke_tts_model(model_name: str, text: str, voice_name: str = "Puck"):
 
@@ -47,8 +45,8 @@ def _pcm_to_wav(pcm_bytes: bytes, sample_rate: int = 24000) -> bytes:
 
     wav_io = io.BytesIO()
     with wave.open(wav_io, 'wb') as wf:
-        wf.setnchannels(1)       # Mono
-        wf.setsampwidth(2)      # 16-bit PCM (2 bytes per sample)
+        wf.setnchannels(1)       
+        wf.setsampwidth(2)      
         wf.setframerate(sample_rate)
         wf.writeframes(pcm_bytes)
     return wav_io.getvalue()
@@ -89,15 +87,9 @@ def convert_text_to_audio(text: str, output_path: str = None, voice_name: str = 
                     current_model = next_model
                     e = fallback_err
             else:
-                raise LlmApiException(
-                    "All primary and fallback AI services are currently overloaded. Please try again later."
-                ) from e
-        elif "token" in error_str or "maximum context length" in error_str:
-            raise LlmApiException("The text exceeded the maximum processing limit.") from e
-        elif any(auth_kw in error_str for auth_kw in ["401", "403", "invalid api key", "unauthorized", "forbidden"]):
-            raise LlmApiException("Authentication issue with the AI service. Please check API credentials.") from e
-        else:
-            raise LlmApiException(f"An unexpected AI service error occurred (check the API): {str(e)}") from e
+                raise handle_api_exception(e, service_name="text-to-voice service", is_overloaded=True) from e
+        
+        raise handle_api_exception(e, service_name="text-to-voice service") from e
 
     audio_bytes = None
     if response and response.candidates:
@@ -106,7 +98,6 @@ def convert_text_to_audio(text: str, output_path: str = None, voice_name: str = 
                 for part in candidate.content.parts:
                     if part.inline_data and part.inline_data.data:
                         raw_pcm = part.inline_data.data
-                        # If raw PCM, convert to WAV with RIFF header
                         if not raw_pcm.startswith(b'RIFF'):
                             audio_bytes = _pcm_to_wav(raw_pcm, sample_rate=24000)
                         else:
