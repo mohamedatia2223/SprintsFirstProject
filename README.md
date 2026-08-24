@@ -10,15 +10,18 @@
   - **Agent 2 (Reviewer)**: Strict fact-checking auditor that verifies draft statements against source passages to prevent hallucinations.
 - **🚨 Leak-Proof Refusal Guardrail**:
   - If Agent 2 rejects a draft answer after maximum revision attempts, unverified drafts are suppressed and a standard refusal message (*"I am sorry, but the provided document set does not contain information to answer this question."*) is returned.
-- **⚡ Dynamic Model Failover Chain**:
-  - Primary LLM: `gemini-3.1-flash-lite`
-  - Automatic rate limit / quota overload failovers: `gemini-3.5-flash-lite` → `gemini-2.5-flash`
+- **⚡ Flexible Model Selection & Dynamic Failover Chain**:
+  - Full model selection flexibility: choose any Gemini model (e.g., `gemini-3.1-flash-lite`, `gemini-3.5-flash`, `gemini-2.5-flash`) dynamically via the Streamlit sidebar or `.env` configuration.
+  - Automatic rate limit / quota overload failovers: `gemini-3.1-flash-lite` → `gemini-3.5-flash-lite` → `gemini-2.5-flash`.
 - **🔊 Multi-Modal Voice Features**:
   - **Voice-to-Text**: Speech transcription using Google Gemini multimodal capabilities.
   - **Text-to-Voice**: Generates natural speech audio (`WAV`) output using Gemini TTS models (`Puck` voice).
 - **🖥️ Dual Interfaces**:
   - **Streamlit App (`src/app/chatStreamlit.py`)**: Interactive web UI with model selection, chat history, source expanders, and mic recording.
   - **Flask REST API (`src/app/main.py`)**: REST endpoints for `/api/chat`, `/api/voice-to-text`, and `/api/text-to-voice`.
+- **📝 PDF-to-Markdown Token Optimization**:
+  - Automatically converts raw PDF files (`.pdf`) into structured, clean Markdown (`.md`) with explicit page markers (`<!-- Page N -->`) and header hierarchies before chunking.
+  - Eliminates unnecessary binary noise, headers/footers, and duplicate whitespace, **drastically saving token usage** during LLM retrieval, reranking, and prompting.
 - **📊 100-Test Benchmark Harness (`testScripts/generate_100_tests.py`)**:
   - Rigorous evaluation suite (70 in-domain + 30 out-of-domain questions) measuring execution success, refusal precision, and supported answer accuracy.
 
@@ -142,6 +145,11 @@ The API server runs at `http://localhost:5000`.
 ---
 
 ## 📥 Document Ingestion Pipeline
+
+The document ingestion pipeline uses a two-step process optimized for accuracy and token efficiency:
+
+1. **PDF to Markdown Conversion (`src/core/pdf_to_text.py`)**: Converts raw `.pdf` documents into formatted `.md` markdown files with explicit page markers (`<!-- Page N -->`). Cleaning boilerplate formatting **significantly saves token usage** during LLM prompting and cross-encoder reranking.
+2. **Chunking & Vector Embedding (`src/pipeline/ingestion.py`)**: Splits the Markdown text into structured 800-character chunks (with 150-char overlap) preserving page numbers and section headers, embeds them with `gemini-embedding-001`, and upserts into Qdrant.
 
 To re-ingest the full 131-page PDF document into Qdrant:
 
