@@ -126,7 +126,7 @@ TERTIARY_MODEL = gemini-2.5-flash
 ### Option A: Launch Streamlit Web UI
 
 ```bash
-streamlit run src/app/chatStreamlit.py
+streamlit run app.py
 ```
 Open your browser at `http://localhost:8501`.
 
