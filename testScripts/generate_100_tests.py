@@ -1,26 +1,20 @@
-"""
-Automated Test Runner for Sprints Practice Task 0.
-Generates and executes 100 test questions (70 in-domain + 30 out-of-domain refusal questions),
-evaluating the Researcher & Reviewer Multi-Agent Assistant workflow for correctness and logging
-structured output to logs/test_runs.json.
-"""
-
 import sys
 import os
+
+# Add project root to sys.path before importing local packages
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import time
 import json
 import logging
-
-# Ensure project root is in sys.path when running file directly
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from src.pipeline.orchestration import run_assistant
 from src.core.prompts import STANDARD_REFUSAL_MESSAGE
+
+
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-# List of 100 benchmark test questions (70 In-Domain + 30 Out-Of-Domain Refusal)
 IN_DOMAIN_QUESTIONS = [
     "What is the primary difference between an asset and a liability?",
     "What are the six main lessons taught by Rich Dad in the book?",
@@ -136,10 +130,8 @@ TEST_BENCHMARK_CASES = [
 
 def run_benchmark():
     total_tests = len(TEST_BENCHMARK_CASES)
-    logger.info("==================================================")
     logger.info("Starting 100 Test Cases Benchmark Evaluation...")
     logger.info(f"Total Questions: {total_tests} (70 In-Domain, 30 Out-of-Domain Refusal)")
-    logger.info("==================================================")
 
     start_time = time.time()
     execution_success_count = 0
@@ -198,7 +190,6 @@ def run_benchmark():
 
             logger.info(f"[{idx}/{total_tests}] Result: {'CORRECT' if is_correct else 'INCORRECT'} | Verdict: {state.reviewer_verdict} (Refusal: {actual_refusal})")
 
-            # Pacing to respect API rate limits
             time.sleep(1.0)
 
         else:
@@ -230,7 +221,6 @@ def run_benchmark():
     print(f"Total Time:         {total_time}s")
     print("=" * 50 + "\n")
 
-    # Save structured results log
     log_file_path = os.path.join("logs", "test_runs.json")
     os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
     summary_data = {
